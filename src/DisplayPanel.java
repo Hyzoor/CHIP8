@@ -26,7 +26,7 @@ public class DisplayPanel extends JPanel {
         for (int x = 0; x < 64; x++) {
             for(int y = 0; y < 32; y++){
                 if(display.getPixel(x, y)){
-                    g.setColor(Color.WHITE);
+                    g.setColor(Color.BLACK);
                 }else{
                     g.setColor(Color.BLACK);
                 }

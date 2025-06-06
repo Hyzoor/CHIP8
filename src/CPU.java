@@ -1,3 +1,5 @@
+import java.util.Random;
+
 public class CPU {
 
     private final byte[] registersV = new byte[16];         //Registers V0 - VF (8-bit)
@@ -9,14 +11,18 @@ public class CPU {
 
     private final Memory memory;
     private final Display display;
-
+    Random random;
 
     public CPU(Memory memory, Display display) {
         this.memory = memory;
         this.display = display;
+        this.random = new Random();
         reset();
     }
 
+    private void add2PC(){
+        PC = (short)(PC + 2);
+    }
 
     public void cycle(){
 
@@ -25,12 +31,33 @@ public class CPU {
 
     }
 
+    private void reset(){
+        PC = (short)(0x200);
+        SP = 0;
+        registerIndex = 0;
+        display.clear();
+    }
+
+    private byte getnibble(short instruction, int i){
+
+        return switch(i){
+
+            case 1 -> (byte) ((instruction & 0xF000) >> 12);
+            case 2 -> (byte) ((instruction & 0x0F00) >> 8);
+            case 3 -> (byte) ((instruction & 0x00F0) >> 4);
+            case 4 -> (byte) (instruction & 0x000F);
+            default -> throw new RuntimeException("Nibble must be 1-4");
+
+        };
+
+    }
+
     private short fetch(){
         byte msb = (byte)(memory.read(PC) & 0xFF);
         byte lsb = (byte)(memory.read((short)(PC+1)) & 0xFF);
 
         short instruction = (short)(msb << 8 | lsb);
-        PC = (short)(PC + 2);
+        add2PC();
 
         return instruction;
     }
@@ -51,26 +78,55 @@ public class CPU {
                 switch(instruction){
                     // 00E0 CLS - Clear the display
                     case 0x00E0: display.clear(); break;
+
                     // 00EE RET - Return from a subroutine
-                    case 0x00EE: break;
+                    case 0x00EE: PC = stack[SP--]; break;
+
                     // 0nnn SYS address - Jump to a machine code routine at nnn
-                    default:
+                    default: //Not implemented
                 }
                 break;
 
             // 1nnn JP address - PC = nnn
             case 0x1: PC = nnn; break;
 
+            // 2nnn CALL address - Call subroutine at nnn
+            case 0x2: stack[++SP] = PC; PC = nnn; break;
+
+            // 3xnn SE Vx, byte - Skip next instruction if Vx = nn;
+            case 0x3: if(registersV[x] == nn) add2PC(); break;
+
+            // 4xnn SNE Vx, byte - Skip next instruction if Vx != nn
+            case 0x4: if(registersV[x] != nn) add2PC(); break;
+
+            // 5xy0 SE Vx, Vy - SKip next instruction if Vx == Vy
+            case 0x5: if(registersV[x] == registersV[y]) add2PC(); break;
+
             // 6xnn LD Vx, byte - Set Vx = nn
             case 0x6: registersV[x] = nn; break;
 
-            //7xnn ADD Vx, byte - Set Vx = Vx + nn
+            // 7xnn ADD Vx, byte - Set Vx = Vx + nn
             case 0x7: registersV[x] += nn; break;
 
-            //Annn LD I, nnn - Set I = nnn
+            case 0x8:
+                switch(instruction){
+
+                }
+                break;
+
+            // 9xy0 SNE Vx, Vy - Skip next instruction if Vx != Vy
+            case 0x9: if(registersV[x] != registersV[y]) add2PC(); break;
+
+            // Annn LD I, nnn - Set I = nnn
             case 0xA: registerIndex = nnn; break;
 
-            //Dxyn DRW Vx, Vy, nibble - Display n-byte sprite starting at mem[Index] set VF = collision
+            // Bnnn JP V0, address - Jump to nnn + V0
+            case 0xB: PC = (short)(nnn + registersV[0x0]); break;
+
+            // Cxkk RND Vx, byte - Set Vx = random byte AND nn
+            case 0xC: registersV[x] = (byte)(random.nextInt(256) & (nn & 0xFF)); break;
+
+            // Dxyn DRW Vx, Vy, nibble - Display n-byte sprite starting at mem[Index] set VF = collision
             case 0xD:
                 int xpos = registersV[x] & 0xFF;
                 int ypos = registersV[y] & 0xFF;
@@ -97,27 +153,6 @@ public class CPU {
                 break;
 
         }
-    }
-
-    private byte getnibble(short instruction, int i){
-
-        return switch(i){
-
-            case 1 -> (byte) ((instruction & 0xF000) >> 12);
-            case 2 -> (byte) ((instruction & 0x0F00) >> 8);
-            case 3 -> (byte) ((instruction & 0x00F0) >> 4);
-            case 4 -> (byte) (instruction & 0x000F);
-            default -> throw new RuntimeException("Nibble must be 1-4");
-
-        };
-
-    }
-
-    private void reset(){
-        PC = (short)(0x200);
-        SP = 0;
-        registerIndex = 0;
-        display.clear();
     }
 
 

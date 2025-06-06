@@ -2,12 +2,12 @@ import javax.swing.*;
 
 public class Frame extends JFrame {
 
-    public Frame(Display display, int pixelSize) {
+    public Frame(DisplayPanel displayPanel) {
         setTitle("CHIP8 Display");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        DisplayPanel panel = new DisplayPanel(display, pixelSize);
-        add(panel);
+
+        add(displayPanel);
 
         pack();
         setLocationRelativeTo(null);
