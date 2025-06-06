@@ -3,7 +3,7 @@ import javax.swing.*;
 public class Frame extends JFrame {
 
     public Frame(DisplayPanel displayPanel) {
-        setTitle("CHIP8 Display");
+        setTitle("CHIP8 Emulator");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 

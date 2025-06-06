@@ -21,6 +21,7 @@ public class Display {
 
     public void clear(){
         screen = new boolean[64][32];
+        repaint();
     }
 
     public void addChangeListener(Runnable listener) {
