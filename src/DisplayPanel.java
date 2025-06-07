@@ -6,9 +6,9 @@ public class DisplayPanel extends JPanel {
     private final Display display;
     private final int pixelSize;
 
-    public DisplayPanel(Display display, int pixelSize) {
+    public DisplayPanel(Display display) {
         this.display = display;
-        this.pixelSize = pixelSize;
+        this.pixelSize = display.getPixelSize();
         setPreferredSize(new Dimension(64 * pixelSize, 32 * pixelSize));
         setBackground(Color.BLACK);
 

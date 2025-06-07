@@ -4,32 +4,38 @@ import java.nio.file.Path;
 
 public class Memory {
 
-    private byte[] memory = new byte[4096];
+    private char[] memoryArray;
 
-    public void write(short address, byte value) {
-        memory[address] = value;
+    public Memory() {
+        this.memoryArray = new char[4096];
+        initSprites();
     }
 
-    public byte read(short address) {
-        return memory[address];
+    public void write(char address, char b) {
+        memoryArray[address] = b;
     }
 
-    public void loadROMBytes(byte[] rom) {
-        for (int i = 0; i < rom.length; i++) {
-            write((short) (0x200 + i), rom[i]);
-        }
+    public char read(int address) {
+        return memoryArray[address];
     }
 
     public void loadROM(Path romPath) {
-        byte[] romBytes;
+        byte[] rom;
 
         try {
-
-            romBytes = Files.readAllBytes(romPath);
-            loadROMBytes(romBytes);
-
+            rom = Files.readAllBytes(romPath);
+            for (int i = 0; i < rom.length; i++) {
+                memoryArray[i + 0x200] = (char) (rom[i] & 0xFF);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void initSprites() {
+        char[] sprites = {0xf0, 0x90, 0x90, 0x90, 0xf0, 0x20, 0x60, 0x20, 0x20, 0x70, 0xf0, 0x10, 0xf0, 0x80, 0xf0, 0xf0, 0x10, 0xf0, 0x10, 0xf0, 0x90, 0x90, 0xf0, 0x10, 0x10, 0xf0, 0x80, 0xf0, 0x10, 0xf0, 0xf0, 0x80, 0xf0, 0x90, 0xf0, 0xf0, 0x10, 0x20, 0x40, 0x40, 0xf0, 0x90, 0xf0, 0x90, 0xf0, 0xf0, 0x90, 0xf0, 0x10, 0xf0, 0xf0, 0x90, 0xf0, 0x90, 0xf0, 0xe0, 0x90, 0xe0, 0x90, 0xe0, 0xf0, 0x80, 0x80, 0x80, 0xf0, 0xe0, 0x90, 0x90, 0x90, 0xe0, 0xf0, 0x80, 0xf0, 0x80, 0xf0, 0xf0, 0x80, 0xf0, 0x80, 0x80};
+        for (int i = 0; i < sprites.length; i++) {
+            memoryArray[i] = sprites[i];
         }
     }
 

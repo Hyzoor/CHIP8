@@ -7,22 +7,24 @@ public class Main {
 
         Memory memory = new Memory();
         Display display = new Display();
-        CPU cpu = new CPU(memory, display);
+        Keypad keypad = new Keypad();
+        CPU cpu = new CPU(memory, display, keypad);
 
-        memory.loadROM(Paths.get("src/tests/2-ibm-logo.ch8"));
-//        memory.loadROM(Paths.get("src/tests/test_opcode.ch8"));
-
-
-
-        int pixelSize = 18;
-        DisplayPanel panel = new DisplayPanel(display, pixelSize);
+        DisplayPanel panel = new DisplayPanel(display);
         Frame frame = new Frame(panel);
+        frame.addKeyListener(keypad);
 
+//        memory.loadROM(Paths.get("src/tests/2-ibm-logo.ch8"));
+//        memory.loadROM(Paths.get("src/tests/bc_test.ch8"));
+//        memory.loadROM(Paths.get("src/roms/1-chip8-logo.ch8"));
+//        memory.loadROM(Paths.get("src/roms/4-flags.ch8"));
+//        memory.loadROM(Paths.get("src/roms/3-corax+.ch8"));
+        memory.loadROM(Paths.get("src/tests/test_opcode.ch8"));
 
 
         while(true){
             cpu.cycle();
-            Thread.sleep(200);
+            Thread.sleep(20);
         }
 
     }

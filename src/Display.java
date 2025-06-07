@@ -3,6 +3,7 @@ import java.util.List;
 
 public class Display {
 
+    private final int pixelSize = 16;
     private boolean[][] screen = new boolean[64][32];
     private final List<Runnable> listeners = new ArrayList<>();
 
@@ -32,5 +33,9 @@ public class Display {
         for (Runnable listener : listeners) {
             listener.run();
         }
+    }
+
+    public int getPixelSize(){
+        return pixelSize;
     }
 }
